@@ -1,0 +1,95 @@
+Google Data Analysis using R Script for
+
+#Installing and loading of necessary R packages#
+
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("lubridate")
+library(lubridate)
+install.packages("janitor")
+library(janitor)
+install.packages("skimr")
+library(skimr)
+
+#Importing the Dataset#
+
+Jan22 <- read.csv("C:/Users/Tosin/Documents/R/202201-divvy-tripdata.csv")
+Feb22 <- read.csv("C:/Users/Tosin/Documents/R/202202-divvy-tripdata.csv")
+Mar22 <- read.csv("C:/Users/Tosin/Documents/R/202203-divvy-tripdata.csv")
+Apr22 <- read.csv("C:/Users/Tosin/Documents/R/202204-divvy-tripdata.csv")
+May22 <- read.csv("C:/Users/Tosin/Documents/R/202205-divvy-tripdata.csv")
+Jun22 <- read.csv("C:/Users/Tosin/Documents/R/202206-divvy-tripdata.csv")
+Jul22 <- read.csv("C:/Users/Tosin/Documents/R/202207-divvy-tripdata.csv")
+Aug22 <- read.csv("C:/Users/Tosin/Documents/R/202208-divvy-tripdata.csv")
+Sep22 <- read.csv("C:/Users/Tosin/Documents/R/202201-divvy-tripdata.csv")
+Oct22 <- read.csv("C:/Users/Tosin/Documents/R/202210-divvy-tripdata.csv")
+Nov22 <- read.csv("C:/Users/Tosin/Documents/R/202211-divvy-tripdata.csv")
+Dec22 <- read.csv("C:/Users/Tosin/Documents/R/202212-divvy-tripdata.csv")
+
+
+# Combining data of different months into a single dataset#
+
+All_trips <- rbind(Jan22, Feb22, Mar22, Apr22, May22,
+	    Jun22, Jul22, Aug22, Sep22, Oct22, Nov22, Dec22)
+
+#Renaming of a column "member_casual" to "membership_type" within All_trips# 
+
+All_trips <- rename(All_trips, membership_type = member_casual)
+
+
+#Trimming/removal of trailing and leading Whitespaces.#
+
+All_trips <- All_trips %>%
+ mutate(ride_id = str_trim(ride_id, side = 'both'),
+        rideable_type = str_trim(rideable_type, side = 'both'),
+	      start_station_name = str_trim(start_station_name, side= 'both'),
+end_station_name = str_trim(end_station_name, side= 'both'),
+membership_type = str_trim(membership_type, side= 'both'))
+
+
+#This to do away with station names(Start and End) thats null.#
+All_trips_cleaned <- All_trips %>%
+			filter (!(start_station_name == "| end_station_name"))
+
+View(All_trips_cleaned)
+
+also
+glimpse(All_trips_cleaned)
+
+Data Transformation
+DEstination route
+All_trips_cleaned$trip_route <- paste(All_trips_cleaned$start_station_name, 
+					All_trips_cleaned$end_station_name, sep = ' - ')
+## you can edit using the same formula up.
+
+
+
+All_trips_transformed <- All_trips_cleaned %>%
+    mutate(month = month(started_at, label = TRUE),
+           day = wday(started_at, label = TRUE),
+           hour = hour(started_at),
+	   ride_in_hours = difftime(ended_at, started_at, unit = 'hours'),
+	   ride_in_mins = difftime(ended_at, started_at, unit = 'mins'))
+
+
+##R6
+All_trips_processed <- All_trips_transformed %>%
+                    filter(ride_in_hours <24, ride_in_mins > 1)
+
+
+//
+max(All_trips_processed$ride_in_hours)
+min(All_trips_processed$ride_in_mins)
+
+
+//R8 You have to create a file directory manally
+write.csv(All_trips_transformed, "C:/Users/Tosin/Documents/Google/Capstone/Bike-Trips.csv")   You have to create a file directory manally
+
+
+Convert Days to be Weekends or Weekdays. Allot Day number for easy grouping.
+
+Convert Months into Seasons.  
+
+
+
+
